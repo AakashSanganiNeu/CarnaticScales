@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnatic to Western Scale Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #053c09;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: rgba(222, 224, 227, 0.748);
+            box-shadow: 0 7px 11px rgba(108, 101, 101, 0.619);
+            border-radius: 10px;
+        }
+        select, button, input {
+            font-size: 1rem;
+            padding: 10px;
+            margin: 10px 0;
+            /* border: 1px solid #c86767; */
+            /* border-radius: 5px;1 */
+            width: 30%;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #000000;
+        }
+        #notations {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #0f0052;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Carnatic to Western Scale Converter</h1>
+        <p>Select a Carnatic Scale:</p>
+        <select id="carnatic-scale">
+            <option value="mayamalavagowla">Mayamalavagowla</option>
+            <option value="shankarabharanam">Shankarabharanam</option>
+            <option value="kalyani">Kalyani</option>
+            <option value="todi">Todi</option>
+        </select>
+
+        <input type="text" id="base-note" placeholder="C" maxlength="2">
+
+        <button onclick="convertScale()">Convert</button>
+
+        <div id="output"></div>
+        <div id="notations"></div>
+    </div>
+
+    <script>
+        const scales = {
+            mayamalavagowla: ["C", "C#", "E", "F", "G", "G#", "B"],
+            shankarabharanam: ["C", "D", "E", "F", "G", "A", "B"],
+            kalyani: ["C", "D", "E", "F#", "G", "A", "B"],
+            todi: ["C", "C#", "D", "F", "F#", "G", "A"],
+        };
+
+        const carnaticNotations = ["Sa", "Ri", "Ga", "Ma", "Pa", "Dha", "Ni"];
+        const semitoneMap = {
+            "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5, "F#": 6,
+            "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
+        };
+
+        function convertScale() {
+            const scaleKey = document.getElementById("carnatic-scale").value;
+            const baseNote = document.getElementById("base-note").value || "C";
+            const westernScale = scales[scaleKey];
+
+            if (!westernScale) {
+                document.getElementById("output").innerText = "Scale not found!";
+                return;
+            }
+
+            // Transpose scale based on baseNote semitone difference
+            const baseSemitone = semitoneMap[baseNote];
+            if (baseSemitone === undefined) {
+                document.getElementById("output").innerText = "Invalid base note!";
+                return;
+            }
+
+            const transposedScale = westernScale.map(note => {
+                const transposedSemitone = (semitoneMap[note] - semitoneMap[westernScale[0]] + baseSemitone + 12) % 12;
+                return Object.keys(semitoneMap).find(key => semitoneMap[key] === transposedSemitone);
+            });
+
+            // Calculate distances of notes from the parent note (Sa)
+            const distancesFromParent = transposedScale.map(note => {
+                const distance = (semitoneMap[note] - baseSemitone + 12) % 12;
+                return `${note} (${distance})`;
+            });
+
+            document.getElementById("output").innerText =
+                `Western Scale (based on ${baseNote}): ${transposedScale.join(", ")}`;
+
+            const notations = transposedScale.map((note, index) =>
+                `${carnaticNotations[index % carnaticNotations.length]} (${note})`
+            );
+
+            document.getElementById("notations").innerText =
+                `Carnatic Notations: ${notations.join(", ")}\nNote Distances: ${distancesFromParent.join(", ")}`;
+        }
+    </script>
+</body>
+</html>

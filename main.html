@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnatic to Western Scale Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #272626;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #357522;
+            box-shadow: 0 4px 8px rgb(182, 35, 35);
+            border-radius: 10px;
+        }
+        select, button {
+            font-size: 1rem;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #00f81d;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgb(182, 35, 35);
+            width: 100%;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        #notations {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Carnatic to Western Scale Converter</h1>
+        <p>Select a Carnatic Scale:</p>
+        <select id="carnatic-scale">
+            <option value="mayamalavagowla">Mayamalavagowla</option>
+            <option value="shankarabharanam">Shankarabharanam</option>
+            <option value="kalyani">Kalyani</option>
+            <option value="todi">Todi</option>
+        </select>
+
+        <p>Enter Base Note (Default: C):</p>
+        <input type="text" id="base-note" placeholder="C" maxlength="2">
+
+        <button onclick="convertScale()">Convert</button>
+
+        <div id="output"></div>
+        <div id="notations"></div>
+    </div>
+
+    <script>
+        const scales = {
+            mayamalavagowla: ["C", "C#", "E", "F", "G", "G#", "B"],
+            shankarabharanam: ["C", "D", "E", "F", "G", "A", "B"],
+            kalyani: ["C", "D", "E", "F#", "G", "A", "B"],
+            todi: ["C", "C#", "D", "F", "F#", "G", "A"],
+        };
+
+        const carnaticNotations = ["Sa", "Ri", "Ga", "Ma", "Pa", "Dha", "Ni"];
+
+        function convertScale() {
+            const scaleKey = document.getElementById("carnatic-scale").value;
+            const baseNote = document.getElementById("base-note").value || "C";
+
+            const westernScale = scales[scaleKey];
+            if (!westernScale) {
+                document.getElementById("output").innerText = "Scale not found!";
+                return;
+            }
+            
+
+            const baseIndex = westernScale.indexOf(baseNote);
+            const transposedScale = baseIndex !== -1
+                ? westernScale.slice(baseIndex).concat(westernScale.slice(0, baseIndex))
+                : westernScale;
+
+            const distances = transposedScale.map((note, index) => index + 1);
+
+            document.getElementById("output").innerText =
+                `Western Scale (based on ${baseNote}): ${transposedScale.join(", ")}`;
+
+            const notations = transposedScale.map((note, index) =>
+                `${carnaticNotations[index % carnaticNotations.length]} (${note}, ${distances[index]})`
+            );
+
+            document.getElementById("notations").innerText =
+                `Carnatic Notations: ${notations.join(", ")}`;
+        }
+    </script>
+</body>
+</html>
