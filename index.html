@@ -24,8 +24,6 @@
             font-size: 1rem;
             padding: 10px;
             margin: 10px 0;
-            /* border: 1px solid #c86767; */
-            /* border-radius: 5px;1 */
             width: 30%;
         }
         #output {
@@ -44,12 +42,7 @@
     <div class="container">
         <h1>Carnatic to Western Scale Converter</h1>
         <p>Select a Carnatic Scale:</p>
-        <select id="carnatic-scale">
-            <option value="mayamalavagowla">Mayamalavagowla</option>
-            <option value="shankarabharanam">Shankarabharanam</option>
-            <option value="kalyani">Kalyani</option>
-            <option value="todi">Todi</option>
-        </select>
+        <select id="carnatic-scale"></select>
 
         <input type="text" id="base-note" placeholder="C" maxlength="2">
 
@@ -65,6 +58,17 @@
             shankarabharanam: ["C", "D", "E", "F", "G", "A", "B"],
             kalyani: ["C", "D", "E", "F#", "G", "A", "B"],
             todi: ["C", "C#", "D", "F", "F#", "G", "A"],
+            harikambhoji: ["C", "D", "E", "F", "G", "A", "Bb"],
+            kharaharapriya: ["C", "D", "Eb", "F", "G", "A", "Bb"],
+            natabhairavi: ["C", "D", "Eb", "F", "G", "Ab", "Bb"],
+            purvikalyani: ["C", "C#", "E", "F#", "G", "A", "Bb"],
+            charukesi: ["C", "D", "E", "F", "G", "Ab", "Bb"],
+            keeravani: ["C", "D", "Eb", "F", "G", "Ab", "B"],
+            bilahari: ["C", "D", "E", "F", "G", "A", "Bb"],
+            simhendramadhyamam: ["C", "C#", "E", "F", "G", "Ab", "B"],
+            hindolam: ["C", "D#", "F", "G", "A"],
+            mohanam: ["C", "D", "E", "G", "A"],
+            shuddhaDhanyasi: ["C", "D", "F", "G", "A#"]
         };
 
         const carnaticNotations = ["Sa", "Ri", "Ga", "Ma", "Pa", "Dha", "Ni"];
@@ -73,9 +77,18 @@
             "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
         };
 
+        // Populate scale options dynamically
+        const scaleSelect = document.getElementById("carnatic-scale");
+        Object.keys(scales).forEach(scale => {
+            const option = document.createElement("option");
+            option.value = scale;
+            option.textContent = scale.charAt(0).toUpperCase() + scale.slice(1);
+            scaleSelect.appendChild(option);
+        });
+
         function convertScale() {
             const scaleKey = document.getElementById("carnatic-scale").value;
-            const baseNote = document.getElementById("base-note").value || "C";
+            const baseNoteInput = document.getElementById("base-note").value.trim().toUpperCase() || "C";
             const westernScale = scales[scaleKey];
 
             if (!westernScale) {
@@ -83,10 +96,9 @@
                 return;
             }
 
-            // Transpose scale based on baseNote semitone difference
-            const baseSemitone = semitoneMap[baseNote];
+            const baseSemitone = semitoneMap[baseNoteInput];
             if (baseSemitone === undefined) {
-                document.getElementById("output").innerText = "Invalid base note!";
+                document.getElementById("output").innerText = "Invalid base note! Please use valid notes like C, C#, D, etc.";
                 return;
             }
 
@@ -95,21 +107,20 @@
                 return Object.keys(semitoneMap).find(key => semitoneMap[key] === transposedSemitone);
             });
 
-            // Calculate distances of notes from the parent note (Sa)
             const distancesFromParent = transposedScale.map(note => {
                 const distance = (semitoneMap[note] - baseSemitone + 12) % 12;
                 return `${note} (${distance})`;
             });
 
             document.getElementById("output").innerText =
-                `Western Scale (based on ${baseNote}): ${transposedScale.join(", ")}`;
+                `Western Scale (based on ${baseNoteInput}): ${transposedScale.join(", ")}`;
 
             const notations = transposedScale.map((note, index) =>
                 `${carnaticNotations[index % carnaticNotations.length]} (${note})`
             );
 
             document.getElementById("notations").innerText =
-                `Carnatic Notations: ${notations.join(", ")}\nNote Distances: ${distancesFromParent.join(", ")}`;
+                `Carnatic Notations: ${notations.join(", ")}`;
         }
     </script>
 </body>
