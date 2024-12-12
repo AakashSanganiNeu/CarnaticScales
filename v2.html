@@ -26,17 +26,7 @@
             margin: 10px 0;
             width: 30%;
         }
-        button {
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #output, #guitar-output {
+        #output {
             margin-top: 20px;
             font-size: 1.2rem;
             color: #000000;
@@ -45,41 +35,6 @@
             margin-top: 10px;
             font-size: 1rem;
             color: #0f0052;
-        }
-        .guitar-output-container {
-            display: none;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .guitar-output-container.active {
-            display: block;
-        }
-        .output-title {
-            font-weight: bold;
-            color: #333;
-        }
-        .fret-row {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 5px;
-        }
-        .fret-row div {
-            margin: 0 5px;
-            padding: 5px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .color1 {
-            background-color: #FFDDC1;
-        }
-        .color2 {
-            background-color: #FFC1E3;
-        }
-        .color3 {
-            background-color: #C1E1FF;
         }
     </style>
 </head>
@@ -92,11 +47,9 @@
         <input type="text" id="base-note" placeholder="C" maxlength="2">
 
         <button onclick="convertScale()">Convert</button>
-        <button onclick="toggleGuitarOutput()">Show Guitar Positions</button>
 
         <div id="output"></div>
         <div id="notations"></div>
-        <div id="guitar-output" class="guitar-output-container"></div>
     </div>
 
     <script>
@@ -124,8 +77,6 @@
             "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
         };
 
-        const guitarTuning = ["E", "A", "D", "G", "B", "E"];
-
         // Populate scale options dynamically
         const scaleSelect = document.getElementById("carnatic-scale");
         Object.keys(scales).forEach(scale => {
@@ -140,25 +91,6 @@
                 (semitoneMap[note] - semitoneMap[scaleNotes[0]] + 12) % 12
             );
             return distances;
-        }
-
-        function findNotePositions(scaleNotes) {
-            const positions = Array.from({ length: 16 }, () => []);
-
-            for (let string = 0; string < guitarTuning.length; string++) {
-                const openNoteSemitone = semitoneMap[guitarTuning[string]];
-
-                for (let fret = 0; fret <= 15; fret++) {
-                    const currentNoteSemitone = (openNoteSemitone + fret) % 12;
-                    const note = Object.keys(semitoneMap).find(key => semitoneMap[key] === currentNoteSemitone);
-
-                    if (scaleNotes.includes(note)) {
-                        positions[fret].push(`${note} - (s-${string + 1})`);
-                    }
-                }
-            }
-
-            return positions;
         }
 
         function convertScale() {
@@ -183,7 +115,6 @@
             });
 
             const distances = calculateDistances(transposedScale);
-            const positions = findNotePositions(transposedScale);
 
             document.getElementById("output").innerText =
                 `Western Scale (based on ${baseNoteInput}): ${transposedScale.join(", ")}`;
@@ -194,29 +125,7 @@
 
             document.getElementById("notations").innerText =
                 `Carnatic Notations: ${notations.join(", ")}\nDistances: ${distances.join(", ")}`;
-
-            displayGuitarPositions(positions);
-        }
-
-        function displayGuitarPositions(positions) {
-            const container = document.getElementById("guitar-output");
-            container.innerHTML = "<div class='output-title'>Guitar Positions:</div>";
-
-            positions.forEach((fretPositions, fret) => {
-                if (fretPositions.length > 0) {
-                    const row = document.createElement("div");
-                    row.classList.add("fret-row", `color${(fret % 3) + 1}`);
-                    row.innerText = `Fret ${fret}: ${fretPositions.join(", ")}`;
-                    container.appendChild(row);
-                }
-            });
-        }
-
-        function toggleGuitarOutput() {
-            const container = document.getElementById("guitar-output");
-            container.classList.toggle("active");
         }
     </script>
 </body>
 </html>
-
