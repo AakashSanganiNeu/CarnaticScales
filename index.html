@@ -86,6 +86,13 @@
             scaleSelect.appendChild(option);
         });
 
+        function calculateDistances(scaleNotes) {
+            const distances = scaleNotes.map(note => 
+                (semitoneMap[note] - semitoneMap[scaleNotes[0]] + 12) % 12
+            );
+            return distances;
+        }
+
         function convertScale() {
             const scaleKey = document.getElementById("carnatic-scale").value;
             const baseNoteInput = document.getElementById("base-note").value.trim().toUpperCase() || "C";
@@ -107,10 +114,7 @@
                 return Object.keys(semitoneMap).find(key => semitoneMap[key] === transposedSemitone);
             });
 
-            const distancesFromParent = transposedScale.map(note => {
-                const distance = (semitoneMap[note] - baseSemitone + 12) % 12;
-                return `${note} (${distance})`;
-            });
+            const distances = calculateDistances(transposedScale);
 
             document.getElementById("output").innerText =
                 `Western Scale (based on ${baseNoteInput}): ${transposedScale.join(", ")}`;
@@ -120,7 +124,7 @@
             );
 
             document.getElementById("notations").innerText =
-                `Carnatic Notations: ${notations.join(", ")}`;
+                `Carnatic Notations: ${notations.join(", ")}\nDistances: ${distances.join(", ")}`;
         }
     </script>
 </body>
